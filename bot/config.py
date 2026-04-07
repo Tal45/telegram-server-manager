@@ -1,0 +1,10 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+AUTHORIZED_USER_ID = int(os.getenv("AUTHORIZED_USER_ID", 0))
+
+if not BOT_TOKEN:
+    raise ValueError("BOT_TOKEN is not set in .env")

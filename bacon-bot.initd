@@ -1,0 +1,25 @@
+#!/sbin/openrc-run
+
+# Service script for the Bacon Telegram Bot
+# Place this in /etc/init.d/bacon-bot
+# Usage: rc-service bacon-bot start
+
+name="bacon-bot"
+description="Telegram bot for network status on OnePlus One"
+
+# Change these to your actual paths
+directory="/root/bacon-bot/bot"
+command="/root/bacon-bot/venv/bin/python3"
+command_args="main.py"
+pidfile="/run/${RC_SVCNAME}.pid"
+command_background="yes"
+
+# Optional: ensure network is up before starting
+depend() {
+    need net
+    after logger
+}
+
+start_pre() {
+    checkpath --directory --owner root:root --mode 0775 /run/${RC_SVCNAME}
+}
