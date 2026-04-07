@@ -62,7 +62,7 @@ A modular Telegram bot designed for postmarketOS (Alpine-based) running on the O
    sudo chmod +x /etc/init.d/bacon-bot
    ```
 
-2. Edit `/etc/init.d/bacon-bot` to set the correct `directory` and `command` paths for your environment.
+2. Edit `/etc/init.d/bacon-bot` to set the correct `directory` and `command` paths for your environment. Note: `RC_SVCNAME` is an internal OpenRC variable that automatically resolves to the name of the service script (e.g., `bacon-bot`).
 
 3. Manage the service:
    ```bash
