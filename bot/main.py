@@ -1,10 +1,10 @@
 import logging
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, filters
 from config import BOT_TOKEN, LOG_FILE
 from handlers.start import start
 from handlers.ip import ip
 from handlers.health import health
-from handlers.shutdown import shutdown
+from handlers.shutdown import shutdown, shutdown_callback
 from handlers.unknown import unknown
 
 # Enable logging
@@ -29,6 +29,7 @@ def main():
     application.add_handler(CommandHandler("ip", ip))
     application.add_handler(CommandHandler("health", health))
     application.add_handler(CommandHandler("shutdown", shutdown))
+    application.add_handler(CallbackQueryHandler(shutdown_callback, pattern="^shutdown_"))
     
     # Unknown commands
     application.add_handler(MessageHandler(filters.COMMAND, unknown))
