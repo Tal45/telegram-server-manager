@@ -4,6 +4,7 @@ from config import BOT_TOKEN, LOG_FILE
 from handlers.start import start
 from handlers.ip import ip
 from handlers.health import health
+from handlers.shutdown import shutdown
 from handlers.unknown import unknown
 
 # Enable logging
@@ -27,6 +28,7 @@ def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("ip", ip))
     application.add_handler(CommandHandler("health", health))
+    application.add_handler(CommandHandler("shutdown", shutdown))
     
     # Unknown commands
     application.add_handler(MessageHandler(filters.COMMAND, unknown))
