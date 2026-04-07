@@ -1,6 +1,6 @@
 import logging
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
-from config import BOT_TOKEN
+from config import BOT_TOKEN, LOG_FILE
 from handlers.start import start
 from handlers.ip import ip
 from handlers.health import health
@@ -8,7 +8,12 @@ from handlers.unknown import unknown
 
 # Enable logging
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler(LOG_FILE),
+        logging.StreamHandler()
+    ]
 )
 
 def main():
