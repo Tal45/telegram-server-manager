@@ -22,7 +22,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 # logging.getLogger("telegram.ext").setLevel(logging.WARNING)
 
 def main():
-    application = ApplicationBuilder().token(BOT_TOKEN).build()
+    application = ApplicationBuilder().token(BOT_TOKEN).read_timeout(30).connect_timeout(30).build()
     
     # Handlers
     application.add_handler(CommandHandler("start", start))
@@ -34,7 +34,7 @@ def main():
     application.add_handler(MessageHandler(filters.COMMAND, unknown))
     
     print("Bacon bot is starting...")
-    application.run_polling()
+    application.run_polling(bootstrap_retries=-1)
 
 if __name__ == "__main__":
     main()
