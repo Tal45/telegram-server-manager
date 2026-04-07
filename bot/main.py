@@ -16,6 +16,10 @@ logging.basicConfig(
     ]
 )
 
+# Set specific levels for noisy libraries
+logging.getLogger("httpx").setLevel(logging.WARNING)
+# logging.getLogger("telegram.ext").setLevel(logging.WARNING)
+
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     
