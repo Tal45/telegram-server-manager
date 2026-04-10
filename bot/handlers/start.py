@@ -11,6 +11,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/start - Show this help message\n"
         "/ip - Show network information (Hostname, SSID, IP)\n"
         "/health - Show device health (Battery status, Capacity)\n"
+        "/nginx - Manage nginx service (Start/Stop/Status)\n"
         "/shutdown - Power off the system"
     )
     await update.message.reply_text(welcome_msg, parse_mode="Markdown")

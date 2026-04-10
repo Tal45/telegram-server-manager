@@ -5,6 +5,7 @@ from handlers.start import start
 from handlers.ip import ip
 from handlers.health import health
 from handlers.shutdown import shutdown, shutdown_callback
+from handlers.nginx import nginx_command, nginx_callback
 from handlers.unknown import unknown
 
 # Enable logging
@@ -29,7 +30,9 @@ def main():
     application.add_handler(CommandHandler("ip", ip))
     application.add_handler(CommandHandler("health", health))
     application.add_handler(CommandHandler("shutdown", shutdown))
+    application.add_handler(CommandHandler("nginx", nginx_command))
     application.add_handler(CallbackQueryHandler(shutdown_callback, pattern="^shutdown_"))
+    application.add_handler(CallbackQueryHandler(nginx_callback, pattern="^nginx_"))
     
     # Unknown commands
     application.add_handler(MessageHandler(filters.COMMAND, unknown))
