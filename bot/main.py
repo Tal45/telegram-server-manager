@@ -6,6 +6,8 @@ from handlers.ip import ip
 from handlers.health import health
 from handlers.shutdown import shutdown, shutdown_callback
 from handlers.nginx import nginx_command, nginx_callback
+from handlers.wifi import wifi_command, wifi_callback
+from handlers.ssh import addkey
 from handlers.unknown import unknown
 
 # Enable logging
@@ -31,8 +33,13 @@ def main():
     application.add_handler(CommandHandler("health", health))
     application.add_handler(CommandHandler("shutdown", shutdown))
     application.add_handler(CommandHandler("nginx", nginx_command))
+    application.add_handler(CommandHandler("wifi", wifi_command))
+    application.add_handler(CommandHandler("addkey", addkey))
+    application.add_handler(CommandHandler("sshkey", addkey))
+    application.add_handler(MessageHandler(filters.Document.ALL & filters.CaptionRegex(r"^/addkey"), addkey))
     application.add_handler(CallbackQueryHandler(shutdown_callback, pattern="^shutdown_"))
     application.add_handler(CallbackQueryHandler(nginx_callback, pattern="^nginx_"))
+    application.add_handler(CallbackQueryHandler(wifi_callback, pattern="^wifi_"))
     
     # Unknown commands
     application.add_handler(MessageHandler(filters.COMMAND, unknown))
