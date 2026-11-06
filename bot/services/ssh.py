@@ -47,7 +47,8 @@ def parse_and_validate_key(raw_key: str):
         if len(parts) > 3:
             comment = " ".join(parts[3:])
     else:
-        return False, None, None, None, f"Unsupported key type: {parts[0]}"
+        safe_part = parts[0].replace("`", "")
+        return False, None, None, None, f"Unsupported key type: `{safe_part}`"
 
     # Validate base64 encoding of key_data
     try:

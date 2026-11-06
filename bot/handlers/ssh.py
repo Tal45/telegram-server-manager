@@ -36,10 +36,7 @@ async def addkey(update: Update, context: ContextTypes.DEFAULT_TYPE):
             raw_key = content.decode("utf-8", errors="ignore").strip()
         except Exception as e:
             logger.error(f"Error reading attached key document: {e}")
-            await update.message.reply_text(
-                f"Bacon Bot: Error downloading document: {str(e)}",
-                parse_mode="Markdown"
-            )
+            await update.message.reply_text(f"Bacon Bot: Error downloading document: {str(e)}")
             return
 
     # If no key was detected, display usage information
@@ -63,5 +60,6 @@ async def addkey(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await update.message.reply_text(f"{prefix}{message}", parse_mode="Markdown")
     except Exception:
-        await update.message.reply_text(f"{prefix}{message}")
+        await update.message.reply_text(f"{prefix}{message}".replace("`", ""))
+
 
