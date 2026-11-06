@@ -154,17 +154,53 @@ def get_saved_wifi_connections():
     except Exception:
         return []
 
+def _rollback_connection(previous_conn: str, failed_ssid: str, was_already_saved: bool) -> str:
+    """
+    Cleans up a failed new Wi-Fi profile and reconnects to the previous active connection.
+    """
+    if not was_already_saved and failed_ssid:
+        try:
+            subprocess.run(
+                ["nmcli", "connection", "delete", "id", failed_ssid],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+        except Exception:
+            pass
+
+    if previous_conn and previous_conn != failed_ssid:
+        try:
+            res = subprocess.run(
+                ["nmcli", "connection", "up", "id", previous_conn],
+                capture_output=True,
+                text=True,
+                timeout=25
+            )
+            if res.returncode == 0:
+                time.sleep(3)
+                ip = get_ip_address() or "Unknown"
+                return f"Fell back to previous network '{previous_conn}' (IP: {ip})."
+            return f"Attempted fallback to '{previous_conn}', but it returned: {res.stderr.strip() or res.stdout.strip()}"
+        except Exception as e:
+            return f"Failed to fall back to '{previous_conn}': {str(e)}"
+
+    return "No previous connection available to fall back to."
+
 def connect_wifi(ssid: str, password: str = None) -> tuple:
     """
     Connects to a Wi-Fi network using nmcli.
     If already saved and password is not supplied, brings up the saved connection.
     Otherwise initiates a connection using dev wifi connect.
+    If the connection fails or times out, automatically rolls back to the previous network.
     Returns (success: bool, message: str).
     """
-    try:
-        saved_conns = get_saved_wifi_connections()
+    previous_conn, _ = get_current_connection()
+    saved_conns = get_saved_wifi_connections()
+    was_already_saved = ssid in saved_conns
 
-        if ssid in saved_conns and not password:
+    try:
+        if was_already_saved and not password:
             cmd = ["nmcli", "connection", "up", "id", ssid]
         elif password:
             cmd = ["nmcli", "dev", "wifi", "connect", ssid, "password", password]
@@ -174,14 +210,22 @@ def connect_wifi(ssid: str, password: str = None) -> tuple:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
         if result.returncode == 0:
-            time.sleep(3)
-            new_ip = get_ip_address() or "Acquiring IP..."
-            return True, f"Connected to '{ssid}' successfully.\nIP: {new_ip}"
+            new_ip = None
+            for _ in range(5):
+                time.sleep(1)
+                new_ip = get_ip_address()
+                if new_ip:
+                    break
+            return True, f"Connected to '{ssid}' successfully.\nIP: {new_ip or 'Acquiring IP...'}"
         else:
             err = result.stderr.strip() or result.stdout.strip()
-            return False, f"Failed to connect to '{ssid}': {err}"
+            fallback_msg = _rollback_connection(previous_conn, ssid, was_already_saved)
+            return False, f"Failed to connect to '{ssid}': {err}\n{fallback_msg}"
 
     except subprocess.TimeoutExpired:
-        return False, f"Connection attempt to '{ssid}' timed out."
+        fallback_msg = _rollback_connection(previous_conn, ssid, was_already_saved)
+        return False, f"Connection attempt to '{ssid}' timed out.\n{fallback_msg}"
     except Exception as e:
-        return False, f"Error connecting to '{ssid}': {str(e)}"
+        fallback_msg = _rollback_connection(previous_conn, ssid, was_already_saved)
+        return False, f"Error connecting to '{ssid}': {str(e)}\n{fallback_msg}"
+
