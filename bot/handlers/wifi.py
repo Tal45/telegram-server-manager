@@ -41,7 +41,8 @@ def build_scan_view():
     ]
 
     if not success:
-        text_lines.append(f"Scan failed: {scan_result}")
+        safe_err = str(scan_result).replace("`", "")
+        text_lines.append(f"Scan failed: `{safe_err}`")
     elif not scan_result:
         text_lines.append("No Wi-Fi networks found.")
     else:
@@ -169,7 +170,7 @@ async def wifi_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         success, message = connect_wifi(target_ssid, password)
         prefix = "Bacon Bot: " if success else "Bacon Bot Error: "
-        await update.message.reply_text(f"{prefix}{message}", parse_mode="Markdown")
+        await update.message.reply_text(f"{prefix}{message}")
         return
 
     # Unknown subcommand
@@ -210,6 +211,7 @@ async def wifi_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Attempt to edit or send new message after network transition
         try:
-            await query.edit_message_text(f"{prefix}{message}", parse_mode="Markdown")
+            await query.edit_message_text(f"{prefix}{message}")
         except Exception:
-            await query.message.reply_text(f"{prefix}{message}", parse_mode="Markdown")
+            await query.message.reply_text(f"{prefix}{message}")
+

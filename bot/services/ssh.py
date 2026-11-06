@@ -100,7 +100,7 @@ def add_authorized_key(raw_key: str, username: str = None) -> tuple:
                     if len(line_parts) >= 2:
                         # Compare key type and base64 data to detect duplicate
                         if line_parts[0] == key_type and line_parts[1] == key_data:
-                            return True, f"Key is already present in authorized_keys for user '{user}'."
+                            return True, f"Key is already present in `authorized_keys` for user `{user}`."
 
             # Ensure newline before appending if existing file does not end with one
             needs_leading_newline = False
@@ -134,9 +134,11 @@ def add_authorized_key(raw_key: str, username: str = None) -> tuple:
         except Exception:
             pass
 
-        comment_info = f"\nComment: {comment}" if comment else ""
-        return True, f"SSH key successfully added for user '{user}'.\nType: {key_type}{comment_info}"
+        safe_comment = comment.replace("`", "") if comment else ""
+        comment_info = f"\nComment: `{safe_comment}`" if safe_comment else ""
+        return True, f"SSH key successfully added for user `{user}`.\nType: `{key_type}`{comment_info}"
 
     except Exception as e:
         logger.error(f"Failed to add SSH key: {e}")
-        return False, f"Failed to save key: {str(e)}"
+        return False, f"Failed to save key: `{str(e).replace('`', '')}`"
+

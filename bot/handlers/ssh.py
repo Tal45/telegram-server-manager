@@ -60,4 +60,8 @@ async def addkey(update: Update, context: ContextTypes.DEFAULT_TYPE):
     success, message = add_authorized_key(raw_key)
 
     prefix = "Bacon Bot: " if success else "Bacon Bot Error: "
-    await update.message.reply_text(f"{prefix}{message}", parse_mode="Markdown")
+    try:
+        await update.message.reply_text(f"{prefix}{message}", parse_mode="Markdown")
+    except Exception:
+        await update.message.reply_text(f"{prefix}{message}")
+
